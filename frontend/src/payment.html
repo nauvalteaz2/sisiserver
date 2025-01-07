@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payments</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f9fa;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ccc;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>cart</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Barang</th>
+        <th>Harga</th>
+      </tr>
+    </thead>
+    <tbody id="paymentList">
+      <!-- Data akan dimuat di sini -->
+    </tbody>
+  </table>
+  <script>
+    async function fetchPayments() {
+      try {
+        const response = await fetch("http://localhost:3003/payments");
+        if (response.ok) {
+          const payments = await response.json();
+          const paymentList = document.getElementById("paymentList");
+          payments.forEach(payment => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${payment.barang}</td>
+              <td>${payment.harga}</td>
+            `;
+            paymentList.appendChild(row);
+          });
+        } else {
+          console.error("Failed to fetch payments:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching payments:", error);
+      }
+    }
+
+    // Load payments saat halaman terbuka
+    fetchPayments();
+  </script>
+</body>
+</html>
