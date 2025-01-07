@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+
+  order-service:
+    build:
+      context: ./order-service
+    ports:
+      - "3001:3001"
+
+  user-service:
+    build:
+      context: ./user-service
+    ports:
+      - "3002:3002"
+
+  payment-service:
+    build:
+      context: ./payment-service
+    ports:
+      - "3003:3003"
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
