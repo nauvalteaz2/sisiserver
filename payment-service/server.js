@@ -45,6 +45,28 @@ app.get("/payments", async (req, res) => {
     res.status(500).send({ message: "Internal server error" });
   }
 });
+const { ObjectId } = require("mongodb");
+
+app.delete("/payments/:id", async (req, res) => {
+  try {
+    if (!db) {
+      return res.status(500).send({ message: "Database not connected" });
+    }
+
+    const paymentId = req.params.id;
+
+    const result = await db.collection("payments").deleteOne({ _id: new ObjectId(paymentId) });
+
+    if (result.deletedCount === 1) {
+      res.status(200).send({ message: "Payment deleted successfully." });
+    } else {
+      res.status(404).send({ message: "Payment not found." });
+    }
+  } catch (error) {
+    console.error("Error deleting payment:", error);
+    res.status(500).send({ message: "Internal server error." });
+  }
+});
 
 // Start Server
 app.listen(PORT, () => {

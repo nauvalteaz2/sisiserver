@@ -8,12 +8,52 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background-color: #f8f9fa;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+    }
+    header h1 {
+      margin: 0;
+    }
+    header .button {
+      background-color: white;
+      color: #007bff;
+      border: none;
+      padding: 8px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    nav {
+      background-color: #007bff;
+      display: flex-start;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 20px;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      padding: 8px 15px;
+      border-radius: 5px;
+      transition: background-color 0.2s ease;
+    }
+    nav a:hover {
+      background-color: #0056b3;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 20px;
     }
     th, td {
       padding: 10px;
@@ -48,24 +88,50 @@
     .navigate-button:hover {
       background-color: #0056b3;
     }
+    main {
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>Barang Tersedia</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Price</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody id="orderList">
-      <!-- Data akan dimuat di sini -->
-    </tbody>
-  </table>
-  <a href="payment.html" class="navigate-button">Go to Payment</a>
+  <!-- Header -->
+  <header>
+    <h1>E-commerce App</h1>
+    <button class="button" id="logoutButton">Logout</button>
+  </header>
+
+  <!-- Navbar -->
+  <nav>
+    <a href="createOrder.html">Create Order</a>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+    <h1>Barang Tersedia</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Price</th>
+          <th>Category</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="orderList">
+        <!-- Data akan dimuat di sini -->
+      </tbody>
+    </table>
+    <a href="payment.html" class="navigate-button">Go to Payment</a>
+  </main>
+
   <script>
+    // Logout Button
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      localStorage.setItem("isLoggedIn", "false"); // Hapus status login
+      window.location.href = "index.html"; // Kembali ke halaman utama
+    });
+
+    // Fetch orders
     async function fetchOrders() {
       try {
         const response = await fetch("http://localhost:3001/orders");
@@ -74,9 +140,11 @@
           const orderList = document.getElementById("orderList");
           orders.forEach(order => {
             const row = document.createElement("tr");
+            const cleanHarga = Number(order.harga.toString().replace(/[^0-9]/g, ''));
             row.innerHTML = `
               <td>${order.barang}</td>
-              <td>${order.harga}</td>
+              <td>Rp ${cleanHarga.toLocaleString()}</td>
+              <td>${order.category_name}</td>
               <td><button onclick="makePayment('${order._id}', '${order.barang}', '${order.harga}')">Order</button></td>
             `;
             orderList.appendChild(row);

@@ -14,6 +14,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-bottom: 20px;
     }
     th, td {
       padding: 10px;
@@ -24,21 +25,73 @@
       background-color: #007bff;
       color: white;
     }
+    .total-price {
+      font-size: 18px;
+      font-weight: bold;
+      text-align: right;
+      margin-bottom: 20px;
+    }
+    .back-button:hover {
+      background-color: #5a6268;
+    }
+    .back-button {
+      display: inline-block;
+      margin-bottom: 20px;
+      padding: 10px 15px;
+      background-color: #6c757d;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .pay-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+    }
+    .pay-button:hover {
+      background-color: #218838;
+    }
+    .delete-button {
+      background-color: #dc3545;
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .delete-button:hover {
+      background-color: #c82333;
+    }
   </style>
 </head>
 <body>
-  <h1>cart</h1>
+  <a href="order.html" class="back-button">← Back to Orders</a>
+  <h1>Cart</h1>
   <table>
     <thead>
       <tr>
         <th>Barang</th>
         <th>Harga</th>
+        <th>Action</th>
       </tr>
     </thead>
     <tbody id="paymentList">
       <!-- Data akan dimuat di sini -->
     </tbody>
   </table>
+  <div class="total-price" id="totalPrice">
+    Total: Rp 0
+  </div>
+  <button class="pay-button" onclick="payNow()">Pay</button>
+
   <script>
     async function fetchPayments() {
       try {
@@ -46,14 +99,26 @@
         if (response.ok) {
           const payments = await response.json();
           const paymentList = document.getElementById("paymentList");
+          const totalPriceElement = document.getElementById("totalPrice");
+          let total = 0;
+
           payments.forEach(payment => {
+            const cleanHarga = Number(payment.harga.toString().replace(/[^0-9]/g, ''));
+
             const row = document.createElement("tr");
             row.innerHTML = `
               <td>${payment.barang}</td>
-              <td>${payment.harga}</td>
+              <td>Rp ${cleanHarga.toLocaleString()}</td>
+              <td>
+                <button class="delete-button" onclick="deletePayment('${payment._id}')">Delete</button>
+              </td>
             `;
             paymentList.appendChild(row);
+
+            total += cleanHarga;
           });
+
+          totalPriceElement.textContent = `Total: Rp ${total.toLocaleString()}`;
         } else {
           console.error("Failed to fetch payments:", response.statusText);
         }
@@ -62,8 +127,30 @@
       }
     }
 
-    // Load payments saat halaman terbuka
-    fetchPayments();
+    async function deletePayment(paymentId) {
+      try {
+        const response = await fetch(`http://localhost:3003/payments/${paymentId}`, {
+          method: "DELETE",
+        });
+
+        if (response.ok) {
+          alert("Payment deleted successfully!");
+          location.reload(); // Reload halaman untuk memuat ulang daftar pembayaran
+        } else {
+          const errorData = await response.json();
+          alert(`Error deleting payment: ${errorData.message}`);
+        }
+      } catch (error) {
+        console.error("Error deleting payment:", error);
+        alert("An error occurred. Please try again.");
+      }
+    }
+
+    function payNow() {
+      alert("Payment successful!");
+    }
+
+    fetchPayments(); // Load payments saat halaman terbuka
   </script>
 </body>
 </html>

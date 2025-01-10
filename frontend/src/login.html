@@ -78,7 +78,8 @@
 
     if (response.ok) {
       alert("Login successful!");
-      window.location.href = "order.html";
+      localStorage.setItem("isLoggedIn", "true"); // Simpan status login
+      window.location.href = "index.html";
     } else {
       alert(`Login failed: ${data.message}`);
     }
